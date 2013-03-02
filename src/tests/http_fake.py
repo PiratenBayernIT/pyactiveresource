@@ -116,7 +116,7 @@ class TestHandler(urllib2.HTTPHandler, urllib2.HTTPSHandler):
                 raise Error('Unknown request %s %s'
                             '\nrequest:%s\nresponse_map:%s' % (
                             request.get_method(), request.get_full_url(),
-                            str(key), pformat(self._response_map.keys())))
+                            str(key), pformat(self._response_map.iterkeys())))
         elif isinstance(self._response, Exception):
             raise(self._response)
         else:

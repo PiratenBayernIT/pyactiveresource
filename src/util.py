@@ -341,7 +341,7 @@ def xml_to_dict(xmlobj, saveroot=True):
         for child in element.getchildren():
             child_element = xml_to_dict(child, saveroot)
             if saveroot and isinstance(child_element, dict):
-                  return_list.append(child_element.values()[0])
+                  return_list.append(child_element.itervalues()[0])
             else:
                   return_list.append(child_element)
         if saveroot:

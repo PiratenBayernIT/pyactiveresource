@@ -83,7 +83,7 @@ class Errors(object):
         Returns:
             None
         """
-        attribute_keys = self.base.attributes.keys()
+        attribute_keys = self.base.attributes.iterkeys()
         try:
             messages = util.xml_to_dict(
                     xml_string)['errors']['error']
@@ -122,7 +122,7 @@ class Errors(object):
             An array of error strings.
         """
         messages = []
-        for key, errors in self.errors.items():
+        for key, errors in self.errors.iteritems():
             for error in errors:
                 if key == 'base':
                     messages.append(error)
@@ -895,7 +895,7 @@ class ActiveResource(object):
         """
         if not isinstance(attributes, dict):
             return
-        for key, value in attributes.items():
+        for key, value in attributes.iteritems():
             if isinstance(value, dict):
                 klass = self._find_class_for(key)
                 attr = klass(value)

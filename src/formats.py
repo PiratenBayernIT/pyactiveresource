@@ -33,5 +33,5 @@ class XMLFormat(Base):
         except util.Error, err:
             raise Error(err)
         if isinstance(data, dict) and len(data) == 1:
-            data = data.values()[0]
+            data = data.itervalues()[0]
         return data
