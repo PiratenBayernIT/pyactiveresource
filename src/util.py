@@ -387,7 +387,7 @@ def xml_to_dict(xmlobj, saveroot=True):
             raise ImportError('PyYaml is not installed: http://pyyaml.org/')
         return yaml.safe_load(element.text)
     elif element_type == 'base64binary':
-        return base64.decodestring(element.text)
+        return base64.decodestring(element.text).decode()
     elif element_type == 'file':
         content_type = element.get('content_type',
                                    'application/octet-stream')

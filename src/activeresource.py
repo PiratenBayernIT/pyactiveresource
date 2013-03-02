@@ -965,8 +965,8 @@ class ActiveResource(object, metaclass=ResourceMeta):
 
         # If we made it this far, no such class was found
         if create_missing:
-            return types.ClassType(class_name, (cls,),
-                                {'__module__': cls.__module__})
+            return types.new_class(class_name, (cls,),
+                                exec_body=lambda ns: ns.update({'__module__': cls.__module__}) or ns)
 
     # methods corresponding to Ruby's custom_methods
     def _custom_method_element_url(self, method_name, options):

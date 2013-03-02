@@ -209,7 +209,8 @@ class Connection(object):
         self.password = password or self.password or ''
 
         if self.user or self.password:
-            self.auth = base64.b64encode('%s:%s' % (self.user, self.password))
+            auth_str = '{}:{}'.format(self.user, self.password)
+            self.auth = base64.b64encode(bytes(auth_str, encoding="ascii"))
         else:
             self.auth = None
         self.timeout = timeout
@@ -264,7 +265,7 @@ class Connection(object):
                 request.add_header(key, value)
         if self.auth:
             # Insert basic authentication header
-            request.add_header('Authorization', 'Basic %s' % self.auth)
+            request.add_header('Authorization', 'Basic {}'.format(self.auth.decode()))
         if request.headers:
             header_string = '\n'.join([':'.join((k, v)) for k, v in
                                        request.headers.items()])
@@ -328,7 +329,7 @@ class Connection(object):
         Returns:
             A dictionary representing a resource.
         """
-        return self.format.decode(self._open('GET', path, headers=headers).body)
+        return self.format.decode(self._open('GET', path, headers=headers).body.decode())
 
     def delete(self, path, headers=None):
         """Perform an HTTP delete request.
