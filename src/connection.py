@@ -170,6 +170,9 @@ class Response(object):
     def __getitem__(self, key):
         return self.headers[key]
 
+    def __hash__(self):
+        return object.__hash__(self)
+
     def get(self, key, value=None):
         return self.headers.get(key, value)
 

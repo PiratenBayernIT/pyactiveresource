@@ -4,7 +4,7 @@
 """Connect to and interact with a REST server and its objects."""
 
 
-import new
+import types
 import re
 import sys
 import urllib
@@ -967,7 +967,7 @@ class ActiveResource(object):
 
         # If we made it this far, no such class was found
         if create_missing:
-            return new.classobj(class_name, (cls,),
+            return types.ClassType(class_name, (cls,),
                                 {'__module__': cls.__module__})
 
     # methods corresponding to Ruby's custom_methods
