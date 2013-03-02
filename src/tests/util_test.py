@@ -14,7 +14,7 @@ from pprint import pprint
 
 def diff_dicts(d1, d2):
     """Print the differences between two dicts. Useful for troubleshooting."""
-    pprint([(k,v) for k,v in d2.iteritems()
+    pprint([(k,v) for k,v in d2.items()
             if v != d1[k]])
 
 
@@ -47,7 +47,7 @@ class UtilTest(unittest.TestCase):
             'id': 1,
             'approved': True,
             'replies_count': 0,
-            'replies_close_in': 2592000000L,
+            'replies_close_in': 2592000000,
             'written_on': datetime.date(2003, 7, 16),
             'viewed_at': util.date_parse('2003-07-16T9:28Z'),
             'content': {':message': 'Have a nice day',
@@ -101,7 +101,7 @@ class UtilTest(unittest.TestCase):
           'id': 1,
           'approved': False,
           'replies_count': 0,
-          'replies_close_in': 2592000000L,
+          'replies_close_in': 2592000000,
           'written_on': datetime.date(2003, 7, 16),
           'viewed_at': util.date_parse('2003-07-16T09:28Z'),
           'content': 'Have a nice day',
@@ -270,11 +270,11 @@ class UtilTest(unittest.TestCase):
                          util.xml_to_dict(product_xml, saveroot=True))
 
     def test_to_xml_should_allow_unicode(self):
-        xml = util.to_xml({'data': u'\xe9'})
+        xml = util.to_xml({'data': '\xe9'})
         self.assert_('<data>&#233;</data>' in xml)
 
     def test_to_xml_should_allow_utf8_encoded_strings(self):
-        xml = util.to_xml({'data': u'\xe9'.encode('utf-8')})
+        xml = util.to_xml({'data': '\xe9'.encode('utf-8')})
         self.assert_('<data>&#233;</data>' in xml)
 
     def test_to_xml_should_allow_disabling_dasherization(self):
@@ -304,7 +304,7 @@ class UtilTest(unittest.TestCase):
         self.assertEqual('var=%C3%A5%C3%B1%C3%BC%C3%A8', query)
 
     def test_to_query_with_unicode_strings(self):
-        query = util.to_query({'var': u'\xe5\xf1\xfc\xe8'})
+        query = util.to_query({'var': '\xe5\xf1\xfc\xe8'})
         self.assertEqual('var=%C3%A5%C3%B1%C3%BC%C3%A8', query)
 
     def test_to_query_with_arrays(self):

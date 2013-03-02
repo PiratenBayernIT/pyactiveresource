@@ -8,11 +8,11 @@ __author__ = 'Mark Roach (mrroach@google.com)'
 import base64
 import calendar
 import decimal
-import element_containers
+from . import element_containers
 import re
 import time
 import datetime
-import urllib
+import urllib.request, urllib.parse, urllib.error
 try:
     import yaml
 except ImportError:
@@ -111,17 +111,17 @@ UNCOUNTABLES = ['equipment', 'information', 'rice', 'money', 'species',
 # and should return the element type and modified value.
 SERIALIZERS = [
     {'type': bool,
-     'method': lambda value: ('boolean', unicode(value).lower())},
+     'method': lambda value: ('boolean', str(value).lower())},
     {'type': int,
-     'method': lambda value: ('integer', unicode(value))},
-    {'type': long,
-     'method': lambda value: ('integer', unicode(value))},
+     'method': lambda value: ('integer', str(value))},
+    {'type': int,
+     'method': lambda value: ('integer', str(value))},
     {'type': str,
-     'method': lambda value: (None, unicode(value, 'utf-8'))}]
+     'method': lambda value: (None, str(value, 'utf-8'))}]
 
 DEFAULT_SERIALIZER = {
     'type': object,
-    'method': lambda value: (None, unicode(value))}
+    'method': lambda value: (None, str(value))}
 
 
 class Error(Exception):
@@ -209,23 +209,23 @@ def to_query(query_params):
     """
     def annotate_params(params):
         annotated = {}
-        for key, value in params.iteritems():
+        for key, value in params.items():
             if isinstance(value, list):
                 key = '%s[]' % key
             elif isinstance(value, dict):
                 dict_options = {}
-                for dk, dv in value.iteritems():
+                for dk, dv in value.items():
                     dict_options['%s[%s]' % (key, dk)] = dv
                 annotated.update(annotate_params(dict_options))
                 continue
-            elif isinstance(value, unicode):
+            elif isinstance(value, str):
                 value = value.encode('utf-8')
             else:
                 value = str(value)
             annotated[key] = value
         return annotated
     annotated = annotate_params(query_params)
-    return urllib.urlencode(annotated, True)
+    return urllib.parse.urlencode(annotated, True)
 
 
 def xml_pretty_format(element, level=0):
@@ -296,7 +296,7 @@ def to_xml(obj, root='object', pretty=False, header=True, dasherize=True):
                            pretty=pretty, dasherize=dasherize))
             root_element.append(element)
     else:
-        for key, value in obj.iteritems():
+        for key, value in obj.items():
             key = dasherize and key.replace('_', '-') or key
             if isinstance(value, dict) or isinstance(value, list):
                 element = ET.fromstring(
@@ -323,13 +323,13 @@ def xml_to_dict(xmlobj, saveroot=True):
     Returns:
         An ElementDict object or ElementList for multiple objects
     """
-    if isinstance(xmlobj, basestring):
+    if isinstance(xmlobj, str):
         # Allow for blank (usually HEAD) result on success
         if xmlobj.isspace():
             return {}
         try:
             element = ET.fromstring(xmlobj)
-        except Exception, err:
+        except Exception as err:
             raise Error('Unable to parse xml data: %s' % err)
     else:
         element = xmlobj
@@ -341,7 +341,7 @@ def xml_to_dict(xmlobj, saveroot=True):
         for child in element.getchildren():
             child_element = xml_to_dict(child, saveroot)
             if saveroot and isinstance(child_element, dict):
-                  return_list.append(child_element.itervalues()[0])
+                  return_list.append(iter(child_element.values())[0])
             else:
                   return_list.append(child_element)
         if saveroot:
@@ -366,7 +366,7 @@ def xml_to_dict(xmlobj, saveroot=True):
                         time.strptime(element.text, '%Y-%m-%dT%H:%M:%S+0000'))
 
                 return datetime.datetime.utcfromtimestamp(timestamp)
-            except ValueError, err:
+            except ValueError as err:
                 raise Error('Unable to parse timestamp. Install dateutil'
                             ' (http://labix.org/python-dateutil) or'
                             ' pyxml (http://pyxml.sf.net/topics/)'
@@ -402,10 +402,10 @@ def xml_to_dict(xmlobj, saveroot=True):
         # values, or nested hashes.
         if element_type:
             attributes = element_containers.ElementDict(
-                underscore(element.get('type', '')), element.items())
+                underscore(element.get('type', '')), list(element.items()))
         else:
             attributes = element_containers.ElementDict(singularize(
-                element.tag.replace('-', '_')), element.items())
+                element.tag.replace('-', '_')), list(element.items()))
         for child in element.getchildren():
             attribute = xml_to_dict(child, saveroot)
             child_tag = child.tag.replace('-', '_')
@@ -428,9 +428,9 @@ def xml_to_dict(xmlobj, saveroot=True):
             return {element.tag.replace('-', '_'): attributes}
         else:
             return attributes
-    elif element.items():
+    elif list(element.items()):
         return element_containers.ElementDict(element.tag.replace('-', '_'),
-                                              element.items())
+                                              list(element.items()))
     else:
         return element.text
 

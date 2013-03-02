@@ -6,10 +6,10 @@
 __author__ = 'Mark Roach (mrroach@google.com)'
 
 
-import urllib
-import urllib2
-import urlparse
-from StringIO import StringIO
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
+import urllib.parse
+from io import StringIO
 from pprint import pformat
 
 
@@ -19,8 +19,8 @@ class Error(Exception):
 
 def initialize():
     """Install TestHandler as the only active handler for http requests."""
-    opener = urllib2.build_opener(TestHandler)
-    urllib2.install_opener(opener)
+    opener = urllib.request.build_opener(TestHandler)
+    urllib.request.install_opener(opener)
 
 
 def create_response_key(method, url, request_headers):
@@ -33,12 +33,12 @@ def create_response_key(method, url, request_headers):
     Returns:
         The key as a string.
     """
-    parsed = urlparse.urlsplit(url)
-    qs = urlparse.parse_qs(parsed.query)
-    query = urllib.urlencode([(k, qs[k]) for k in sorted(qs.iterkeys())])
+    parsed = urllib.parse.urlsplit(url)
+    qs = urllib.parse.parse_qs(parsed.query)
+    query = urllib.parse.urlencode([(k, qs[k]) for k in sorted(qs.keys())])
     return str((
         method,
-        urlparse.urlunsplit((
+        urllib.parse.urlunsplit((
             parsed.scheme, parsed.netloc, parsed.path, query, parsed.fragment)),
         dictionary_to_canonical_str(request_headers)))
 
@@ -52,10 +52,10 @@ def dictionary_to_canonical_str(dictionary):
         A string of the dictionary in canonical form.
     """
     return str([(k.capitalize(), dictionary[k]) for k in sorted(
-        dictionary.iterkeys())])
+        dictionary.keys())])
 
 
-class TestHandler(urllib2.HTTPHandler, urllib2.HTTPSHandler):
+class TestHandler(urllib.request.HTTPHandler, urllib.request.HTTPSHandler):
     """A urllib2 handler object which returns a predefined response."""
 
     _response = None
@@ -88,7 +88,7 @@ class TestHandler(urllib2.HTTPHandler, urllib2.HTTPSHandler):
         Returns:
             None
         """
-        key = create_response_key(method, urlparse.urljoin(cls.site, path),
+        key = create_response_key(method, urllib.parse.urljoin(cls.site, path),
                                   request_headers)
         value = (code, body, response_headers)
         cls._response_map[str(key)] = value
@@ -116,9 +116,9 @@ class TestHandler(urllib2.HTTPHandler, urllib2.HTTPSHandler):
                 raise Error('Unknown request %s %s'
                             '\nrequest:%s\nresponse_map:%s' % (
                             request.get_method(), request.get_full_url(),
-                            str(key), pformat(self._response_map.iterkeys())))
+                            str(key), pformat(iter(self._response_map.keys()))))
         elif isinstance(self._response, Exception):
-            raise(self._response)
+            raise self
         else:
             return self._response
 

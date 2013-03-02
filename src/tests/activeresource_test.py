@@ -7,7 +7,7 @@ __author__ = 'Mark Roach (mrroach@google.com)'
 
 import unittest
 import pickle
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from pyactiveresource import activeresource
 from pyactiveresource import connection
 from pyactiveresource import util
@@ -134,7 +134,7 @@ class ActiveResourceTest(unittest.TestCase):
         self.http.respond_to(
             'GET', '/people.xml?name=%C3%83%C3%A9', {},
             util.to_xml([self.arnold], root='people'))
-        arnold = self.person.find_first(name=u'\xc3\xe9')
+        arnold = self.person.find_first(name='\xc3\xe9')
         self.assertEqual(self.arnold, arnold.attributes)
 
     def test_find_should_handle_integer_query_args(self):
@@ -148,11 +148,11 @@ class ActiveResourceTest(unittest.TestCase):
         self.http.respond_to(
             'GET', '/people.xml?employee_id=12345', {},
             util.to_xml([self.arnold], root='people'))
-        arnold = self.person.find_first(employee_id=12345L)
+        arnold = self.person.find_first(employee_id=12345)
         self.assertEqual(self.arnold, arnold.attributes)
 
     def test_find_should_handle_array_query_args(self):
-        query = urllib.urlencode({'vars[]': ['a', 'b', 'c']}, True)
+        query = urllib.parse.urlencode({'vars[]': ['a', 'b', 'c']}, True)
         self.http.respond_to(
             'GET', '/people.xml?%s' % query, {},
             util.to_xml([self.arnold], root='people'))
@@ -160,7 +160,7 @@ class ActiveResourceTest(unittest.TestCase):
         self.assertEqual(self.arnold, arnold.attributes)
 
     def test_find_should_handle_dictionary_query_args(self):
-        query = urllib.urlencode({'vars[key]': 'val'}, True)
+        query = urllib.parse.urlencode({'vars[key]': 'val'}, True)
         self.http.respond_to(
             'GET', '/people.xml?%s' % query, {},
             util.to_xml([self.arnold], root='people'))
@@ -168,7 +168,7 @@ class ActiveResourceTest(unittest.TestCase):
         self.assertEqual(self.arnold, arnold.attributes)
 
     def test_find_should_handle_dictionary_query_args_with_array_value(self):
-        query = urllib.urlencode({'vars[key][]': ['val1', 'val2']}, True)
+        query = urllib.parse.urlencode({'vars[key][]': ['val1', 'val2']}, True)
         self.http.respond_to(
             'GET', '/people.xml?%s' % query, {},
             util.to_xml([self.arnold], root='people'))

@@ -30,8 +30,8 @@ class XMLFormat(Base):
         log.debug('decoding resource: %s', resource_string)
         try:
             data = util.xml_to_dict(resource_string, saveroot=False)
-        except util.Error, err:
+        except util.Error as err:
             raise Error(err)
         if isinstance(data, dict) and len(data) == 1:
-            data = data.itervalues()[0]
+            data = iter(data.values())[0]
         return data

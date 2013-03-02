@@ -7,8 +7,8 @@ import base64
 import logging
 import socket
 import sys
-import urllib2
-import urlparse
+import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 from pyactiveresource import formats
 
 
@@ -106,17 +106,17 @@ class MethodNotAllowed(ClientError):
     pass
 
 
-class Request(urllib2.Request):
+class Request(urllib.request.Request):
     """A request object which allows additional methods."""
 
     def __init__(self, *args, **kwargs):
         self._method = None
-        urllib2.Request.__init__(self, *args, **kwargs)
+        urllib.request.Request.__init__(self, *args, **kwargs)
 
     def get_method(self):
         """Return the HTTP method."""
         if not self._method:
-            return urllib2.Request.get_method(self)
+            return urllib.request.Request.get_method(self)
         return self._method
 
     def set_method(self, method):
@@ -224,14 +224,14 @@ class Connection(object):
         Returns:
             A tuple containing (site, username, password).
         """
-        proto, host, path, query, fragment = urlparse.urlsplit(site)
-        auth_info, host = urllib2.splituser(host)
+        proto, host, path, query, fragment = urllib.parse.urlsplit(site)
+        auth_info, host = urllib.parse.splituser(host)
         if not auth_info:
             user, password = None, None
         else:
-            user, password = urllib2.splitpasswd(auth_info)
+            user, password = urllib.parse.splitpasswd(auth_info)
 
-        new_site = urlparse.urlunparse((proto, host, '', '', '', ''))
+        new_site = urllib.parse.urlunparse((proto, host, '', '', '', ''))
         return (new_site, user, password)
 
     def _request(self, url):
@@ -255,19 +255,19 @@ class Connection(object):
         Returns:
              A Response object.
         """
-        url = urlparse.urljoin(self.site, path)
+        url = urllib.parse.urljoin(self.site, path)
         self.log.info('%s %s', method, url)
         request = self._request(url)
         request.set_method(method)
         if headers:
-            for key, value in headers.iteritems():
+            for key, value in headers.items():
                 request.add_header(key, value)
         if self.auth:
             # Insert basic authentication header
             request.add_header('Authorization', 'Basic %s' % self.auth)
         if request.headers:
             header_string = '\n'.join([':'.join((k, v)) for k, v in
-                                       request.headers.iteritems()])
+                                       request.headers.items()])
             self.log.debug('request-headers:%s', header_string)
         if data:
             request.add_header('Content-Type', self.format.mime_type)
@@ -286,9 +286,9 @@ class Connection(object):
             http_response = None
             try:
                 http_response = self._handle_error(self._urlopen(request))
-            except urllib2.HTTPError, err:
+            except urllib.error.HTTPError as err:
                 http_response = self._handle_error(err)
-            except urllib2.URLError, err:
+            except urllib.error.URLError as err:
                 raise Error(err, url)
             response = Response.from_httpresponse(http_response)
             self.log.debug('Response(code=%d, headers=%s, msg="%s")',
@@ -315,9 +315,9 @@ class Connection(object):
             urllib2.URLError on IO errors.
         """
         if _urllib_has_timeout():
-          return urllib2.urlopen(request, timeout=self.timeout)
+          return urllib.request.urlopen(request, timeout=self.timeout)
         else:
-          return urllib2.urlopen(request)
+          return urllib.request.urlopen(request)
 
     def get(self, path, headers=None):
         """Perform an HTTP get request.

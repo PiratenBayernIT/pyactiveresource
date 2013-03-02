@@ -7,9 +7,9 @@
 import types
 import re
 import sys
-import urllib
-import urllib2
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 from string import Template
 from pyactiveresource import connection
 from pyactiveresource import element_containers
@@ -83,7 +83,7 @@ class Errors(object):
         Returns:
             None
         """
-        attribute_keys = self.base.attributes.iterkeys()
+        attribute_keys = iter(self.base.attributes.keys())
         try:
             messages = util.xml_to_dict(
                     xml_string)['errors']['error']
@@ -122,7 +122,7 @@ class Errors(object):
             An array of error strings.
         """
         messages = []
-        for key, errors in self.errors.iteritems():
+        for key, errors in self.errors.items():
             for error in errors:
                 if key == 'base':
                     messages.append(error)
@@ -212,14 +212,14 @@ class ResourceMeta(type):
 
     def set_site(cls, value):
         if value is not None:
-            host = urlparse.urlsplit(value)[1]
-            auth_info, host = urllib2.splituser(host)
+            host = urllib.parse.urlsplit(value)[1]
+            auth_info, host = urllib.parse.splituser(host)
             if auth_info:
-                user, password = urllib2.splitpasswd(auth_info)
+                user, password = urllib.parse.splitpasswd(auth_info)
                 if user:
-                    cls._user = urllib.unquote(user)
+                    cls._user = urllib.parse.unquote(user)
                 if password:
-                    cls._password = urllib.unquote(password)
+                    cls._password = urllib.parse.unquote(password)
         cls._connection = None
         cls._site = value
 
@@ -273,7 +273,7 @@ class ResourceMeta(type):
         if hasattr(cls, '_prefix_source'):
             return cls._prefix_source
         else:
-            return urlparse.urlsplit(cls.site)[2]
+            return urllib.parse.urlsplit(cls.site)[2]
 
     def set_prefix_source(cls, value):
         """Set the prefix source, which will be rendered into the prefix."""
@@ -296,10 +296,8 @@ class ResourceMeta(type):
                            'Name of attribute that uniquely identies the resource')
 
 
-class ActiveResource(object):
+class ActiveResource(object, metaclass=ResourceMeta):
     """Represents an activeresource object."""
-
-    __metaclass__ = ResourceMeta
     _connection = None
     _format = formats.XMLFormat
     _headers = None
@@ -428,7 +426,7 @@ class ActiveResource(object):
         #TODO(mrroach): figure out prefix_options
         prefix_options = {}
         query_options = {}
-        for key, value in options.iteritems():
+        for key, value in options.items():
             if key in cls._prefix_parameters():
                 prefix_options[key] = value
             else:
@@ -710,7 +708,7 @@ class ActiveResource(object):
     def to_dict(self):
         """Convert the object to a dictionary."""
         values = {}
-        for key, value in self.attributes.iteritems():
+        for key, value in self.attributes.items():
             if isinstance(value, list):
                 new_value = []
                 for i in value:
@@ -781,7 +779,7 @@ class ActiveResource(object):
                 new_id = self._id_from_response(response)
                 if new_id:
                     self.id = new_id
-        except connection.ResourceInvalid, err:
+        except connection.ResourceInvalid as err:
             self.errors.from_xml(err.response.body)
             return False
         try:
@@ -895,7 +893,7 @@ class ActiveResource(object):
         """
         if not isinstance(attributes, dict):
             return
-        for key, value in attributes.iteritems():
+        for key, value in attributes.items():
             if isinstance(value, dict):
                 klass = self._find_class_for(key)
                 attr = klass(value)
