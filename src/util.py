@@ -44,7 +44,7 @@ except ImportError:
     except ImportError:
         from xml.etree import ElementTree as ET
 
-XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>'
+XML_HEADER = b'<?xml version="1.0" encoding="UTF-8"?>'
 
 # Patterns blatently stolen from Rails' Inflector
 PLURALIZE_PATTERNS = [
@@ -117,7 +117,7 @@ SERIALIZERS = [
     {'type': int,
      'method': lambda value: ('integer', str(value))},
     {'type': str,
-     'method': lambda value: (None, str(value, 'utf-8'))}]
+     'method': lambda value: (None, str(value))}]
 
 DEFAULT_SERIALIZER = {
     'type': object,
@@ -310,7 +310,7 @@ def to_xml(obj, root='object', pretty=False, header=True, dasherize=True):
         xml_pretty_format(root_element)
     xml_data = ET.tostring(root_element)
     if header:
-        return XML_HEADER + '\n' + xml_data
+        return XML_HEADER + b'\n' + xml_data
     return xml_data
 
 
@@ -323,6 +323,9 @@ def xml_to_dict(xmlobj, saveroot=True):
     Returns:
         An ElementDict object or ElementList for multiple objects
     """
+    if isinstance(xmlobj, bytes):
+        xmlobj = xmlobj.decode()
+    
     if isinstance(xmlobj, str):
         # Allow for blank (usually HEAD) result on success
         if xmlobj.isspace():
