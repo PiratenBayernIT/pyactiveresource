@@ -295,6 +295,9 @@ def to_xml(obj, root='object', pretty=False, header=True, dasherize=True):
                     to_xml(i, root=singularize(root), header=False,
                            pretty=pretty, dasherize=dasherize))
             root_element.append(element)
+    # stupid redmine hack again, see other occurence...
+    elif isinstance(obj, str):
+        return "<value>" + obj + "</value>"
     else:
         for key, value in obj.items():
             key = dasherize and key.replace('_', '-') or key

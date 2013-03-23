@@ -714,6 +714,9 @@ class ActiveResource(object, metaclass=ResourceMeta):
                 for i in value:
                   if isinstance(i, dict):
                       new_value.append(i)
+                  # XXX funny hack for redmine ;)
+                  elif isinstance(i, str):
+                      new_value.append(i)
                   else:
                       new_value.append(i.to_dict())
                 values[key] = new_value
@@ -891,6 +894,7 @@ class ActiveResource(object, metaclass=ResourceMeta):
         Returns:
             None
         """
+        
         if not isinstance(attributes, dict):
             return
         for key, value in attributes.items():
@@ -898,8 +902,12 @@ class ActiveResource(object, metaclass=ResourceMeta):
                 klass = self._find_class_for(key)
                 attr = klass(value)
             elif isinstance(value, list):
-                klass = self._find_class_for_collection(key)
-                attr = [klass(child) for child in value]
+                    # XXX funny hack for redmine ;)
+                    if self.__class__.__name__ == "CustomField":
+                        klass = str
+                    else:
+                        klass = self._find_class_for_collection(key)
+                    attr = [klass(child) for child in value]
             else:
                 attr = value
             # Store the actual value in the attributes dictionary
