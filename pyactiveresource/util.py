@@ -7,7 +7,7 @@ __author__ = 'Mark Roach (mrroach@google.com)'
 import base64
 import calendar
 import decimal
-import element_containers
+from . import element_containers
 import re
 import time
 import datetime
