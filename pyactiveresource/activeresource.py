@@ -13,6 +13,7 @@ from pyactiveresource import connection
 from pyactiveresource import element_containers
 from pyactiveresource import formats
 from pyactiveresource import util
+from pyactiveresource._compat import iteritems, iterkeys
 
 
 VALID_NAME = re.compile('[a-z_]\w*')  # Valid python attribute names
@@ -74,7 +75,7 @@ class Errors(object):
         self.errors = {}
 
     def from_array(self, messages):
-        attribute_keys = self.base.attributes.keys()
+        attribute_keys = iterkeys(self.base.attributes)
         for message in messages:
             attr_name = message.split()[0]
             key = util.underscore(attr_name)
@@ -84,8 +85,8 @@ class Errors(object):
                 self.add_to_base(message)
 
     def from_hash(self, messages):
-        attribute_keys = self.base.attributes.keys()
-        for key, errors in messages.iteritems():
+        attribute_keys = iterkeys(self.base.attributes)
+        for key, errors in iteritems(messages):
             for message in errors:
                 if key in attribute_keys:
                     self.add(key, message)
@@ -156,7 +157,7 @@ class Errors(object):
             An array of error strings.
         """
         messages = []
-        for key, errors in self.errors.iteritems():
+        for key, errors in iteritems(self.errors):
             for error in errors:
                 if key == 'base':
                     messages.append(error)
@@ -265,7 +266,7 @@ class ResourceMeta(type):
 
     def set_headers(cls, value):
         cls._headers = value
-    
+
     headers = property(get_headers, set_headers, None,
                        'HTTP headers.')
 
@@ -275,7 +276,7 @@ class ResourceMeta(type):
     def set_timeout(cls, value):
         cls._connection = None
         cls._timeout = value
-    
+
     timeout = property(get_timeout, set_timeout, None,
                        'Socket timeout for HTTP operations')
 
@@ -285,7 +286,7 @@ class ResourceMeta(type):
     def set_format(cls, value):
         cls._connection = None
         cls._format = value
-    
+
     format = property(get_format, set_format, None,
                        'A format object for encoding/decoding requests')
 
@@ -294,7 +295,7 @@ class ResourceMeta(type):
 
     def set_plural(cls, value):
         cls._plural = value
-    
+
     plural = property(get_plural, set_plural, None,
                       'The plural name of this object type.')
 
@@ -303,7 +304,7 @@ class ResourceMeta(type):
 
     def set_singular(cls, value):
         cls._singular = value
-    
+
     singular = property(get_singular, set_singular, None,
                         'The singular name of this object type.')
 
@@ -467,7 +468,7 @@ class ActiveResource(object):
         #TODO(mrroach): figure out prefix_options
         prefix_options = {}
         query_options = {}
-        for key, value in options.iteritems():
+        for key, value in iteritems(options):
             if key in cls._prefix_parameters():
                 prefix_options[key] = value
             else:
@@ -749,7 +750,7 @@ class ActiveResource(object):
     def to_dict(self):
         """Convert the object to a dictionary."""
         values = {}
-        for key, value in self.attributes.iteritems():
+        for key, value in iteritems(self.attributes):
             if isinstance(value, list):
                 new_value = []
                 for item in value:
@@ -934,7 +935,7 @@ class ActiveResource(object):
             return cmp(self.id, other)
 
     def __hash__(self):
-        return hash(tuple(self.attributes.iteritems()))
+        return hash(tuple(iteritems(self.attributes)))
 
     def _update(self, attributes):
         """Update the object with the given attributes.
@@ -946,7 +947,7 @@ class ActiveResource(object):
         """
         if not isinstance(attributes, dict):
             return
-        for key, value in attributes.iteritems():
+        for key, value in iteritems(attributes):
             if isinstance(value, dict):
                 klass = self._find_class_for(key)
                 attr = klass(value)

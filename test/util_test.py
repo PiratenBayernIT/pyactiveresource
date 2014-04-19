@@ -10,11 +10,12 @@ import decimal
 import unittest
 from pyactiveresource import util
 from pprint import pprint
+from pyactiveresource._compat import iteritems
 
 
 def diff_dicts(d1, d2):
     """Print the differences between two dicts. Useful for troubleshooting."""
-    pprint([(k,v) for k,v in d2.iteritems()
+    pprint([(k,v) for k,v in iteritems(d2)
             if v != d1[k]])
 
 

@@ -51,6 +51,8 @@ except ImportError:
     except ImportError:
         from xml.etree import ElementTree as ET
 
+from pyactiveresource._compat import iteritems
+
 XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>'
 
 # Patterns blatently stolen from Rails' Inflector
@@ -216,12 +218,12 @@ def to_query(query_params):
     """
     def annotate_params(params):
         annotated = {}
-        for key, value in params.iteritems():
+        for key, value in iteritems(params):
             if isinstance(value, list):
                 key = '%s[]' % key
             elif isinstance(value, dict):
                 dict_options = {}
-                for dk, dv in value.iteritems():
+                for dk, dv in iteritems(value):
                     dict_options['%s[%s]' % (key, dk)] = dv
                 annotated.update(annotate_params(dict_options))
                 continue
@@ -313,7 +315,7 @@ def _to_xml_element(obj, root, dasherize):
         for value in obj:
             root_element.append(_to_xml_element(value, singularize(root), dasherize))
     elif isinstance(obj, dict):
-        for key, value in obj.iteritems():
+        for key, value in iteritems(obj):
             root_element.append(_to_xml_element(value, key, dasherize))
     else:
         serialize(obj, root_element)

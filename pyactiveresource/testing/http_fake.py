@@ -10,6 +10,7 @@ import urllib2
 import urlparse
 from StringIO import StringIO
 from pprint import pformat
+from pyactiveresource._compat import iterkeys
 
 
 class Error(Exception):
@@ -34,7 +35,7 @@ def create_response_key(method, url, request_headers):
     """
     parsed = urlparse.urlsplit(url)
     qs = urlparse.parse_qs(parsed.query)
-    query = urllib.urlencode([(k, qs[k]) for k in sorted(qs.iterkeys())])
+    query = urllib.urlencode([(k, qs[k]) for k in sorted(iterkeys(qs))])
     return str((
         method,
         urlparse.urlunsplit((
@@ -51,7 +52,7 @@ def dictionary_to_canonical_str(dictionary):
         A string of the dictionary in canonical form.
     """
     return str([(k.capitalize(), dictionary[k]) for k in sorted(
-        dictionary.iterkeys())])
+        iterkeys(dictionary))])
 
 
 class TestHandler(urllib2.HTTPHandler, urllib2.HTTPSHandler):
