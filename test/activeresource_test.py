@@ -169,7 +169,7 @@ class ActiveResourceTest(unittest.TestCase):
         self.http.respond_to(
             'GET', '/people.json?employee_id=12345', {},
             util.to_json([self.arnold], root='people'))
-        arnold = self.person.find_first(employee_id=12345L)
+        arnold = self.person.find_first(employee_id=long(12345))
         self.assertEqual(self.arnold, arnold.attributes)
 
     def test_find_should_handle_array_query_args(self):

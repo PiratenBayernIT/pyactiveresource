@@ -51,7 +51,8 @@ except ImportError:
     except ImportError:
         from xml.etree import ElementTree as ET
 
-from pyactiveresource._compat import iteritems
+from pyactiveresource._compat import iteritems, string_types, text_type,\
+    integer_types
 
 XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>'
 
@@ -120,17 +121,15 @@ UNCOUNTABLES = ['equipment', 'information', 'rice', 'money', 'species',
 # and should return the element type and modified value.
 SERIALIZERS = [
     {'type': bool,
-     'method': lambda value: ('boolean', unicode(value).lower())},
-    {'type': int,
-     'method': lambda value: ('integer', unicode(value))},
-    {'type': long,
-     'method': lambda value: ('integer', unicode(value))},
+     'method': lambda value: ('boolean', text_type(value).lower())},
+    {'type': integer_types,
+     'method': lambda value: ('integer', text_type(value))},
     {'type': str,
-     'method': lambda value: (None, unicode(value, 'utf-8'))}]
+     'method': lambda value: (None, text_type(value, 'utf-8'))}]
 
 DEFAULT_SERIALIZER = {
     'type': object,
-    'method': lambda value: (None, unicode(value))}
+    'method': lambda value: (None, text_type(value))}
 
 
 class Error(Exception):
@@ -227,7 +226,7 @@ def to_query(query_params):
                     dict_options['%s[%s]' % (key, dk)] = dv
                 annotated.update(annotate_params(dict_options))
                 continue
-            elif isinstance(value, unicode):
+            elif isinstance(value, text_type):
                 value = value.encode('utf-8')
             else:
                 value = str(value)
@@ -354,7 +353,7 @@ def xml_to_dict(xmlobj, saveroot=True):
     Returns:
         An ElementDict object or ElementList for multiple objects
     """
-    if isinstance(xmlobj, basestring):
+    if isinstance(xmlobj, string_types):
         # Allow for blank (usually HEAD) result on success
         if xmlobj.isspace():
             return {}

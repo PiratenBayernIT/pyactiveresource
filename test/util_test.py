@@ -10,7 +10,10 @@ import decimal
 import unittest
 from pyactiveresource import util
 from pprint import pprint
-from pyactiveresource._compat import iteritems
+from pyactiveresource._compat import iteritems, PY2
+
+if not PY2:
+    long = int
 
 
 def diff_dicts(d1, d2):
@@ -48,7 +51,7 @@ class UtilTest(unittest.TestCase):
             'id': 1,
             'approved': True,
             'replies_count': 0,
-            'replies_close_in': 2592000000L,
+            'replies_close_in': long(2592000000),
             'written_on': datetime.date(2003, 7, 16),
             'viewed_at': util.date_parse('2003-07-16T9:28Z'),
             'content': {':message': 'Have a nice day',
@@ -102,7 +105,7 @@ class UtilTest(unittest.TestCase):
           'id': 1,
           'approved': False,
           'replies_count': 0,
-          'replies_close_in': 2592000000L,
+          'replies_close_in': long(2592000000),
           'written_on': datetime.date(2003, 7, 16),
           'viewed_at': util.date_parse('2003-07-16T09:28Z'),
           'content': 'Have a nice day',
@@ -343,7 +346,7 @@ class UtilTest(unittest.TestCase):
             'id': 1,
             'approved': True,
             'replies_count': 0,
-            'replies_close_in': 2592000000L,
+            'replies_close_in': long(2592000000),
             'written_on': "2003-07-16",
             'viewed_at': "2003-07-16T09:28:00+0000",
             'content': "--- \n1: should be an integer\n:message: Have a nice day\narray: \n- should-have-dashes: true\n  should_have_underscores: true\n",
