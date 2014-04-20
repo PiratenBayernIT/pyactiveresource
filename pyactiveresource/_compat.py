@@ -18,9 +18,20 @@ _identity = lambda x: x
 
 if not PY2:
     text_type = str
+    byte_type = bytes
     string_types = (str,)
     integer_types = (int, )
 
+    def to_byte_type(text, encoding="utf8"):
+        return bytes(text, encoding=encoding)
+
+    def to_text_type(text, encoding=None):
+        if encoding:
+            return str(text, encoding=encoding)
+        else:
+            return str(text)
+
+    iterkeys = lambda d: d.iterkeys()
     iterkeys = lambda d: iter(d.keys())
     itervalues = lambda d: iter(d.values())
     iteritems = lambda d: iter(d.items())
@@ -42,8 +53,18 @@ if not PY2:
 
 else:
     text_type = unicode
+    byte_type = str
     string_types = (str, unicode)
     integer_types = (int, long)
+
+    def to_byte_type(text, encoding="utf8"):
+        return text.encode(encoding=encoding)
+
+    def to_text_type(text, encoding=None):
+        if encoding:
+            return unicode(text, encoding=encoding)
+        else:
+            return unicode(text)
 
     iterkeys = lambda d: d.iterkeys()
     itervalues = lambda d: d.itervalues()

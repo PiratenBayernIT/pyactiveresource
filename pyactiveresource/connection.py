@@ -7,7 +7,8 @@ import logging
 import socket
 import sys
 from pyactiveresource import formats
-from pyactiveresource._compat import iteritems, urlparse, urlerror, urlrequest
+from pyactiveresource._compat import iteritems, urlparse, urlerror, urlrequest, byte_type,\
+    to_byte_type
 
 
 class Error(Exception):
@@ -205,7 +206,8 @@ class Connection(object):
         self.password = password or self.password or ''
 
         if self.user or self.password:
-            self.auth = base64.b64encode('%s:%s' % (self.user, self.password))
+            auth_str = '{}:{}'.format(self.user, self.password)
+            self.auth = base64.b64encode(to_byte_type(auth_str))
         else:
             self.auth = None
         self.timeout = timeout
@@ -260,15 +262,15 @@ class Connection(object):
                 request.add_header(key, value)
         if self.auth:
             # Insert basic authentication header
-            request.add_header('Authorization', 'Basic %s' % self.auth)
+            request.add_header('Authorization', 'Basic {}'.format(self.auth))
         if request.headers:
             header_string = '\n'.join([':'.join((k, v)) for k, v in
                                        iteritems(request.headers)])
             self.log.debug('request-headers:%s', header_string)
         if data:
             request.add_header('Content-Type', self.format.mime_type)
-            request.add_data(data)
-            self.log.debug('request-body:%s', request.get_data())
+            request.data = to_byte_type(data)
+            self.log.debug('request-body:%s', request.data)
         elif method in ['POST', 'PUT']:
           # Some web servers need a content length on all POST/PUT operations
           request.add_header('Content-Type', self.format.mime_type)

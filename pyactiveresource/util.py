@@ -50,8 +50,8 @@ except ImportError:
     except ImportError:
         from xml.etree import ElementTree as ET
 
-from pyactiveresource._compat import iteritems, string_types, text_type,\
-    integer_types, urlparse
+from pyactiveresource._compat import iteritems, string_types, to_text_type, text_type, \
+    integer_types, urlparse, byte_type, to_byte_type
 
 XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>'
 
@@ -120,15 +120,15 @@ UNCOUNTABLES = ['equipment', 'information', 'rice', 'money', 'species',
 # and should return the element type and modified value.
 SERIALIZERS = [
     {'type': bool,
-     'method': lambda value: ('boolean', text_type(value).lower())},
+     'method': lambda value: ('boolean', to_text_type(value).lower())},
     {'type': integer_types,
-     'method': lambda value: ('integer', text_type(value))},
-    {'type': str,
-     'method': lambda value: (None, text_type(value, 'utf-8'))}]
+     'method': lambda value: ('integer', to_text_type(value))},
+    {'type': byte_type,
+     'method': lambda value: (None, to_text_type(value, "utf8"))}]
 
 DEFAULT_SERIALIZER = {
     'type': object,
-    'method': lambda value: (None, text_type(value))}
+    'method': lambda value: (None, to_text_type(value))}
 
 
 class Error(Exception):
@@ -339,7 +339,7 @@ def to_xml(obj, root='object', pretty=False, header=True, dasherize=True):
         xml_pretty_format(root_element)
     xml_data = ET.tostring(root_element)
     if header:
-        return XML_HEADER + '\n' + xml_data
+        return XML_HEADER + '\n' + xml_data.decode("utf8")
     return xml_data
 
 
@@ -412,7 +412,7 @@ def xml_to_dict(xmlobj, saveroot=True):
             raise ImportError('PyYaml is not installed: http://pyyaml.org/')
         return yaml.safe_load(element.text)
     elif element_type == 'base64binary':
-        return base64.decodestring(element.text)
+        return to_text_type(base64.decodestring(to_byte_type(element.text)), "utf8")
     elif element_type == 'file':
         content_type = element.get('content_type',
                                    'application/octet-stream')

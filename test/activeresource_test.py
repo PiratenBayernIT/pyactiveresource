@@ -12,7 +12,10 @@ from pyactiveresource import connection
 from pyactiveresource import formats
 from pyactiveresource import util
 from pyactiveresource.testing import http_fake
-from pyactiveresource._compat import urlparse
+from pyactiveresource._compat import urlparse, PY2
+
+if not PY2:
+    long = int
 
 
 class Error(Exception):

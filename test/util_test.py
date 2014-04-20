@@ -379,11 +379,11 @@ class UtilTest(unittest.TestCase):
 
     def test_to_json_should_allow_unicode(self):
         json = util.to_json({'data': u'\xe9'})
-        self.assert_('\u00e9' in json)
+        self.assert_(r'\u00e9' in json)
 
     def test_to_json_should_allow_utf8_encoded_strings(self):
         json = util.to_json({'data': u'\xe9'.encode('utf-8')})
-        self.assert_('\u00e9' in json)
+        self.assert_(r'\u00e9' in json)
 
     def test_to_json_with_root(self):
         xml = util.to_xml({'title': 'Test'}, root='product')
