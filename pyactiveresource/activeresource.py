@@ -10,7 +10,7 @@ from pyactiveresource import connection
 from pyactiveresource import element_containers
 from pyactiveresource import formats
 from pyactiveresource import util
-from pyactiveresource._compat import iteritems, iterkeys, urlparse
+from pyactiveresource._compat import iteritems, iterkeys, urlparse, with_metaclass
 
 
 VALID_NAME = re.compile('[a-z_]\w*')  # Valid python attribute names
@@ -333,10 +333,9 @@ class ResourceMeta(type):
                            'Name of attribute that uniquely identies the resource')
 
 
-class ActiveResource(object):
+class ActiveResource(with_metaclass(ResourceMeta, object)):
     """Represents an activeresource object."""
 
-    __metaclass__ = ResourceMeta
     _connection = None
     _format = formats.JSONFormat
     _headers = None
