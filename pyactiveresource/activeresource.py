@@ -925,11 +925,17 @@ class ActiveResource(object):
     def __repr__(self):
         return '%s(%s)' % (self._singular, self.id)
 
-    def __cmp__(self, other):
+    def __lt__(self, other):
         if isinstance(other, self.__class__):
-            return cmp(self.id, other.id)
+            return self.id < other.id
         else:
-            return cmp(self.id, other)
+            return self.id < other
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.id == other.id
+        else:
+            return self.id == other
 
     def __hash__(self):
         return hash(tuple(iteritems(self.attributes)))
