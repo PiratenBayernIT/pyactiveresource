@@ -7,12 +7,11 @@ __author__ = 'Mark Roach (mrroach@google.com)'
 
 
 import unittest
-from StringIO import StringIO
 from pyactiveresource import connection
 from pyactiveresource import util
 from pyactiveresource import formats
 from pyactiveresource.testing import http_fake
-from pyactiveresource._compat import urlerror
+from pyactiveresource._compat import urlerror, StringIO
 
 
 class Error(Exception):

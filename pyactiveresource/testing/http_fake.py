@@ -5,11 +5,10 @@
 __author__ = 'Mark Roach (mrroach@google.com)'
 
 
-from StringIO import StringIO
 from pprint import pformat
 from pyactiveresource._compat import iterkeys
 
-from pyactiveresource._compat import urlparse, urlrequest
+from pyactiveresource._compat import urlparse, urlrequest, StringIO
 
 
 class Error(Exception):
