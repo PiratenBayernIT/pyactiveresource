@@ -5,12 +5,11 @@
 __author__ = 'Mark Roach (mrroach@google.com)'
 
 
-import urllib
-import urllib2
-import urlparse
 from StringIO import StringIO
 from pprint import pformat
 from pyactiveresource._compat import iterkeys
+
+from pyactiveresource._compat import urlparse, urlrequest
 
 
 class Error(Exception):
@@ -19,8 +18,8 @@ class Error(Exception):
 
 def initialize():
     """Install TestHandler as the only active handler for http requests."""
-    opener = urllib2.build_opener(TestHandler)
-    urllib2.install_opener(opener)
+    opener = urlrequest.build_opener(TestHandler)
+    urlrequest.install_opener(opener)
 
 
 def create_response_key(method, url, request_headers):
@@ -35,7 +34,7 @@ def create_response_key(method, url, request_headers):
     """
     parsed = urlparse.urlsplit(url)
     qs = urlparse.parse_qs(parsed.query)
-    query = urllib.urlencode([(k, qs[k]) for k in sorted(iterkeys(qs))])
+    query = urlparse.urlencode([(k, qs[k]) for k in sorted(iterkeys(qs))])
     return str((
         method,
         urlparse.urlunsplit((
@@ -55,7 +54,7 @@ def dictionary_to_canonical_str(dictionary):
         iterkeys(dictionary))])
 
 
-class TestHandler(urllib2.HTTPHandler, urllib2.HTTPSHandler):
+class TestHandler(urlrequest.HTTPHandler, urlrequest.HTTPSHandler):
     """A urllib2 handler object which returns a predefined response."""
 
     _response = None

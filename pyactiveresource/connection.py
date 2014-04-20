@@ -6,10 +6,8 @@ import base64
 import logging
 import socket
 import sys
-import urllib2
-import urlparse
 from pyactiveresource import formats
-from pyactiveresource._compat import iteritems
+from pyactiveresource._compat import iteritems, urlparse, urlerror, urlrequest
 
 
 class Error(Exception):
@@ -106,17 +104,17 @@ class MethodNotAllowed(ClientError):
     pass
 
 
-class Request(urllib2.Request):
+class Request(urlrequest.Request):
     """A request object which allows additional methods."""
 
     def __init__(self, *args, **kwargs):
         self._method = None
-        urllib2.Request.__init__(self, *args, **kwargs)
+        urlrequest.Request.__init__(self, *args, **kwargs)
 
     def get_method(self):
         """Return the HTTP method."""
         if not self._method:
-            return urllib2.Request.get_method(self)
+            return urlrequest.Request.get_method(self)
         return self._method
 
     def set_method(self, method):
@@ -223,11 +221,11 @@ class Connection(object):
             A tuple containing (site, username, password).
         """
         proto, host, path, query, fragment = urlparse.urlsplit(site)
-        auth_info, host = urllib2.splituser(host)
+        auth_info, host = urlparse.splituser(host)
         if not auth_info:
             user, password = None, None
         else:
-            user, password = urllib2.splitpasswd(auth_info)
+            user, password = urlparse.splitpasswd(auth_info)
 
         new_site = urlparse.urlunparse((proto, host, '', '', '', ''))
         return (new_site, user, password)
@@ -284,9 +282,9 @@ class Connection(object):
             http_response = None
             try:
                 http_response = self._handle_error(self._urlopen(request))
-            except urllib2.HTTPError as err:
+            except urlerror.HTTPError as err:
                 http_response = self._handle_error(err)
-            except urllib2.URLError as err:
+            except urlerror.URLError as err:
                 raise Error(err, url)
             response = Response.from_httpresponse(http_response)
             self.log.debug('Response(code=%d, headers=%s, msg="%s")',
@@ -309,13 +307,13 @@ class Connection(object):
         Returns:
             An httplib.HTTPResponse object.
         Raises:
-            urllib2.HTTPError on server errors.
-            urllib2.URLError on IO errors.
+            urlerror.HTTPError on server errors.
+            urlerror.URLError on IO errors.
         """
         if _urllib_has_timeout():
-          return urllib2.urlopen(request, timeout=self.timeout)
+          return urlrequest.urlopen(request, timeout=self.timeout)
         else:
-          return urllib2.urlopen(request)
+          return urlrequest.urlopen(request)
 
     def get(self, path, headers=None):
         """Perform an HTTP get request.
@@ -378,7 +376,7 @@ class Connection(object):
         """Handle an HTTP error.
 
         Args:
-            err: A urllib2.HTTPError object.
+            err: A urlerror.HTTPError object.
         Returns:
             An HTTP response object if the error is recoverable.
         Raises:

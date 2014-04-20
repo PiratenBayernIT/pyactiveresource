@@ -4,9 +4,9 @@
 
 __author__ = 'Mark Roach (mrroach@google.com)'
 
-import urllib
 from pyactiveresource import connection
 from pyactiveresource import formats
+from pyactiveresource._compat import urlparse
 
 class Error(Exception):
     """The base exception class for this module."""
@@ -39,7 +39,7 @@ class FakeConnection(object):
 
     def _split_path(self, path):
         """Return the path and the query string as a dictionary."""
-        path_only, query_string = urllib.splitquery(path)
+        path_only, query_string = urlparse.splitquery(path)
         if query_string:
             query_dict = dict([i.split('=') for i in query_string.split('&')])
         else:

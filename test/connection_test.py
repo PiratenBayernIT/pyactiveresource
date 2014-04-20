@@ -7,12 +7,12 @@ __author__ = 'Mark Roach (mrroach@google.com)'
 
 
 import unittest
-import urllib2
 from StringIO import StringIO
 from pyactiveresource import connection
 from pyactiveresource import util
 from pyactiveresource import formats
 from pyactiveresource.testing import http_fake
+from pyactiveresource._compat import urlerror
 
 
 class Error(Exception):
@@ -43,7 +43,7 @@ class ConnectionTest(unittest.TestCase):
         self.connection = connection.Connection(self.http.site)
     
     def assert_response_raises(self, error, code):
-        response = urllib2.HTTPError('', code, '', {}, StringIO(''))
+        response = urlerror.HTTPError('', code, '', {}, StringIO(''))
         self.http.set_response(response)
         self.assertRaises(error, self.connection._open, '', '')
       

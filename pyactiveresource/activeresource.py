@@ -5,15 +5,12 @@
 
 import re
 import sys
-import urllib
-import urllib2
-import urlparse
 from string import Template
 from pyactiveresource import connection
 from pyactiveresource import element_containers
 from pyactiveresource import formats
 from pyactiveresource import util
-from pyactiveresource._compat import iteritems, iterkeys
+from pyactiveresource._compat import iteritems, iterkeys, urlparse
 
 
 VALID_NAME = re.compile('[a-z_]\w*')  # Valid python attribute names
@@ -248,13 +245,13 @@ class ResourceMeta(type):
     def set_site(cls, value):
         if value is not None:
             host = urlparse.urlsplit(value)[1]
-            auth_info, host = urllib2.splituser(host)
+            auth_info, host = urlparse.splituser(host)
             if auth_info:
-                user, password = urllib2.splitpasswd(auth_info)
+                user, password = urlparse.splitpasswd(auth_info)
                 if user:
-                    cls._user = urllib.unquote(user)
+                    cls._user = urlparse.unquote(user)
                 if password:
-                    cls._password = urllib.unquote(password)
+                    cls._password = urlparse.unquote(password)
         cls._connection = None
         cls._site = value
 

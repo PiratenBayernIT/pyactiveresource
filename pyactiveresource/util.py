@@ -11,7 +11,6 @@ from . import element_containers
 import re
 import time
 import datetime
-import urllib
 try:
     import yaml
 except ImportError:
@@ -52,7 +51,7 @@ except ImportError:
         from xml.etree import ElementTree as ET
 
 from pyactiveresource._compat import iteritems, string_types, text_type,\
-    integer_types
+    integer_types, urlparse
 
 XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>'
 
@@ -233,7 +232,7 @@ def to_query(query_params):
             annotated[key] = value
         return annotated
     annotated = annotate_params(query_params)
-    return urllib.urlencode(annotated, True)
+    return urlparse.urlencode(annotated, True)
 
 
 def xml_pretty_format(element, level=0):

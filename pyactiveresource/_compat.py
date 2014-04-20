@@ -34,6 +34,12 @@ if not PY2:
 
     implements_to_string = _identity
 
+    # url stuff
+    import urllib
+    urlparse = urllib.parse
+    urlerror = urllib.error
+    urlrequest = urllib.request
+
 else:
     text_type = unicode
     string_types = (str, unicode)
@@ -51,3 +57,13 @@ else:
         cls.__unicode__ = cls.__str__
         cls.__str__ = lambda x: x.__unicode__().encode('utf-8')
         return cls
+
+    # url stuff
+    import urlparse
+    import urllib
+    import urllib2
+    urlerror = urllib2
+    urlrequest = urllib2
+    urlparse.urlencode = urllib.urlencode
+    urlparse.splituser = urllib.splituser
+    urlparse.splitpasswd = urllib.splitpasswd

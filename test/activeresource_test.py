@@ -7,12 +7,12 @@ __author__ = 'Mark Roach (mrroach@google.com)'
 
 import unittest
 import pickle
-import urllib
 from pyactiveresource import activeresource
 from pyactiveresource import connection
 from pyactiveresource import formats
 from pyactiveresource import util
 from pyactiveresource.testing import http_fake
+from pyactiveresource._compat import urlparse
 
 
 class Error(Exception):
@@ -173,7 +173,7 @@ class ActiveResourceTest(unittest.TestCase):
         self.assertEqual(self.arnold, arnold.attributes)
 
     def test_find_should_handle_array_query_args(self):
-        query = urllib.urlencode({'vars[]': ['a', 'b', 'c']}, True)
+        query = urlparse.urlencode({'vars[]': ['a', 'b', 'c']}, True)
         self.http.respond_to(
             'GET', '/people.json?%s' % query, {},
             util.to_json([self.arnold], root='people'))
@@ -181,7 +181,7 @@ class ActiveResourceTest(unittest.TestCase):
         self.assertEqual(self.arnold, arnold.attributes)
 
     def test_find_should_handle_dictionary_query_args(self):
-        query = urllib.urlencode({'vars[key]': 'val'}, True)
+        query = urlparse.urlencode({'vars[key]': 'val'}, True)
         self.http.respond_to(
             'GET', '/people.json?%s' % query, {},
             util.to_json([self.arnold], root='people'))
@@ -189,7 +189,7 @@ class ActiveResourceTest(unittest.TestCase):
         self.assertEqual(self.arnold, arnold.attributes)
 
     def test_find_should_handle_dictionary_query_args_with_array_value(self):
-        query = urllib.urlencode({'vars[key][]': ['val1', 'val2']}, True)
+        query = urlparse.urlencode({'vars[key][]': ['val1', 'val2']}, True)
         self.http.respond_to(
             'GET', '/people.json?%s' % query, {},
             util.to_json([self.arnold], root='people'))
