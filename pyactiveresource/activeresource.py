@@ -1005,7 +1005,7 @@ class ActiveResource(object):
             class_name = util.camelize(element_name)
 
         module_path = cls.__module__.split('.')
-        for depth in xrange(len(module_path), 0, -1):
+        for depth in range(len(module_path), 0, -1):
             try:
                 __import__('.'.join(module_path[:depth]))
                 module = sys.modules['.'.join(module_path[:depth])]
