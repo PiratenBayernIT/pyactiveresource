@@ -352,7 +352,10 @@ def xml_to_dict(xmlobj, saveroot=True):
     Returns:
         An ElementDict object or ElementList for multiple objects
     """
-    if isinstance(xmlobj, string_types):
+    if isinstance(xmlobj, byte_type):
+        xmlobj = to_text_type(xmlobj, "utf8")
+
+    if isinstance(xmlobj, text_type):
         # Allow for blank (usually HEAD) result on success
         if xmlobj.isspace():
             return {}
